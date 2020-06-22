@@ -1,6 +1,7 @@
 import const
 import numpy as np
 import pandas as pd
+import os
 from math import sin, cos, asin, acos, atan2
 from numpy.linalg import norm
 from scipy.optimize import fsolve
@@ -9,7 +10,7 @@ from utility import (ecef2pos, ecef2enu, yaw_rotate, earth_radius,
                      rotate_rpy, enu2ecef, spf2ecef)
 
 
-UNDULATION_PATH = r".\res\p85und_qrtdeg_egm96_to360.mean_tide"
+UNDULATION_PATH = os.path.join(".", "p85und_qrtdeg_egm96_to360.mean_tide")
 
 
 class Geometry:
@@ -30,8 +31,9 @@ class Geometry:
         rows = 681
         cols = 1441
         undulation = np.zeros((rows, cols))
-        chuncks = pd.read_csv(path, delim_whitespace=True,
-                              header=-1, iterator=True)
+        chuncks = pd.read_csv(path, sep="\s+",
+                            header=None, iterator=True)
+
         for i in range(rows):
             undulation[i] = chuncks.get_chunk(145).values.flatten()[:1441]
             lats = np.linspace(85, -85, rows)
@@ -288,6 +290,9 @@ class Geometry:
 
 if __name__ == "__main__":
     geometry = Geometry()
+    # chuncks = pd.read_csv(UNDULATION_PATH, sep="\s+",
+                            # header=None, iterator=True)
+    # print(type(chuncks))
     # geometry.tx_pos = np.asarray([-14849239.465, 15882877.420, -14561494.119])
     # geometry.rx_pos = np.asarray([-3147581.506, 3434454.649, -5238650.750])
     # geometry.rx_pos = np.asarray([-4386241.0, 4887114.0, 2122148.0])
